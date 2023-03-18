@@ -1,6 +1,8 @@
 ﻿using BebasFirstLib.Structs.Traits;
 using BebasFirstLib.IO;
 using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace BebasFirstLib.Structs {
     /// <summary>
@@ -49,12 +51,27 @@ namespace BebasFirstLib.Structs {
             } else {
                 for (int i = 0; i < position.Dimension; i++) {
                     int comp = position[i];
-                    if (comp < 0 || comp > Size[i] - 1) {
+                    if (comp < 0 || comp >= Size[i]) {
                         return false;
                     }
-                }   
+                }
                 return true;
-            }   
+            }
+        }
+
+        public List<MapTile> NeighborsOf(MapTile tile) {
+            if(!DimEquals(tile)) throw new ArgumentException();
+
+            List<MapTile> temp = new List<MapTile>();
+            IVector<int> pos = tile.Position;
+            for(int dim = 0; dim < Dimension; dim++) {
+                int orig = pos[dim];
+                pos[dim] = orig - 1; if(IsInBounds(pos)) temp.Add(this[pos]);
+                pos[dim] = orig + 1; if(IsInBounds(pos)) temp.Add(this[pos]);
+                pos[dim] = orig;
+            }
+
+            return temp;
         }
 
         protected int VecToIndex(IVector<int> vec) {
@@ -82,7 +99,7 @@ namespace BebasFirstLib.Structs {
         /// <summary>
         /// Merepresentasikan sebuah sel dalam <see cref="Map{T}"/> yang menyimpan sebuah nilai.
         /// </summary>
-        public struct MapTile : IPosition<int> {
+        public class MapTile : IPosition<int> {
             /// <summary>Nilai dari sel ini.</summary>
             public T Value { get ; set; }
             public IVector<int> Position { get; private set; }

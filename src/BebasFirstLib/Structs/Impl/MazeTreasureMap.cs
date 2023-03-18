@@ -29,6 +29,10 @@ namespace BebasFirstLib.Structs.Impl {
         public IVector<int> StartPos { get; private set; }
         public List<IVector<int>> Treasures { get; private set; }
 
+        public bool Walkable(MapTile tile) {
+            return tile.Value != CHAR_OBSTACLE;
+        }
+
         /// <summary>
         /// Mengakses sel peta pada posisi yang diberikan.
         /// </summary>

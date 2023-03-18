@@ -17,7 +17,9 @@ namespace BebasFirstTerminal.Algorithms {
                 try {
                     TreeBase<T> res = subsearch.Search(successPred);
                     return res;
-                } catch(NotFoundException) { }
+                } catch(NotFoundException) {
+                    
+                }
             }
             throw new NotFoundException();
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BebasFirstLib.Structs {
     /// <summary>
@@ -16,5 +17,12 @@ namespace BebasFirstLib.Structs {
         /// <exception cref="IndexOutOfRangeException"/>
         /// <returns>Elemen pada posisi yang diberikan.</returns>
         TElement this[IVector<TAxis> position] { get; set; }
+
+        /// <summary>
+        /// Mengumpulkan semua elemen yang bertetangga dengan <paramref name="tile"/>.
+        /// </summary>
+        /// <param name="tile">Elemen yang diperiksa.</param>
+        /// <returns>Sebuah <see cref="List{T}"/> berisi elemen-elemen yang bertetangga dengan <paramref name="tile"/>.</returns>
+        List<TElement> NeighborsOf(TElement tile);
     }
 }
