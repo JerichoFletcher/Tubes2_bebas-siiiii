@@ -7,14 +7,14 @@ namespace BebasFirstLib.Structs.Impl {
     /// <summary>
     /// Merepresentasikan sebuah peta terbatas dari persoalan Maze Treasure Hunt.
     /// </summary>
-    public class MazeTreasureMap : Map<char>, IPersistent {
+    public class MazeTreasureMap : Map<MazeTreasureMap.MazeTileType>, IPersistent {
         private const int MAZE_DIMENSION = 2;
         private const char
             CHAR_KRUSTY_KRAB = 'K',
             CHAR_TREASURE = 'T',
             CHAR_TRAVERSABLE = 'R',
             CHAR_OBSTACLE = 'X';
-        private char[] VALID_CHARS = { CHAR_KRUSTY_KRAB, CHAR_TREASURE, CHAR_TRAVERSABLE, CHAR_OBSTACLE };
+        private static char[] VALID_CHARS = { CHAR_TRAVERSABLE, CHAR_OBSTACLE, CHAR_TREASURE, CHAR_KRUSTY_KRAB };
 
         /// <summary>
         /// Membentuk sebuah objek <see cref="MazeTreasureMap{T}"/> berukuran <paramref name="size"/>.
@@ -29,8 +29,18 @@ namespace BebasFirstLib.Structs.Impl {
         public IVector<int> StartPos { get; private set; }
         public List<IVector<int>> Treasures { get; private set; }
 
-        public bool Walkable(MapTile tile) {
-            return tile.Value != CHAR_OBSTACLE;
+        public static bool Walkable(MapTile tile) {
+            return tile.Value != MazeTileType.Obstacle;
+        }
+
+        public static MazeTileType TypeOf(char c) {
+            switch(c) {
+                case CHAR_TRAVERSABLE: return MazeTileType.Walkable;
+                case CHAR_OBSTACLE: return MazeTileType.Obstacle;
+                case CHAR_TREASURE: return MazeTileType.Treasure;
+                case CHAR_KRUSTY_KRAB: return MazeTileType.KrustyKrabs;
+                default: throw new ArgumentException();
+            }
         }
 
         /// <summary>
@@ -44,11 +54,10 @@ namespace BebasFirstLib.Structs.Impl {
         public override MapTile this[IVector<int> position] {
             get => base[position];
             set {
-                if(!IsValidChar(value.Value)) throw new ArgumentOutOfRangeException();
-                if(StartPos != null) throw new InvalidOperationException();
+                if(value.Value == MazeTileType.KrustyKrabs && StartPos != null) throw new InvalidOperationException();
 
-                if(value.Value == CHAR_KRUSTY_KRAB) StartPos = position;
-                if(value.Value == CHAR_TREASURE) Treasures.Add(position);
+                if(value.Value == MazeTileType.KrustyKrabs) StartPos = position;
+                if(value.Value == MazeTileType.Treasure) Treasures.Add(position);
                 base[position] = value;
             }
         }
@@ -76,7 +85,7 @@ namespace BebasFirstLib.Structs.Impl {
                     if(s.Length != 1 || !IsValidChar(s[0])) throw new InvalidDataException();
                     Vector<int> pos = new Vector<int>(MAZE_DIMENSION);
                     pos[0] = x; pos[1] = y;
-                    temp.Add(new MapTile(s[0], pos));
+                    temp.Add(new MapTile(TypeOf(s[0]), pos));
                     y++;
                 }
                 x++;
@@ -100,6 +109,13 @@ namespace BebasFirstLib.Structs.Impl {
                 }
                 fs.WriteLine();
             }
+        }
+
+        public enum MazeTileType {
+            Walkable = 0,
+            Obstacle = 1,
+            Treasure = 2,
+            KrustyKrabs = 3
         }
     }
 }

@@ -116,6 +116,10 @@ namespace BebasFirstLib.Structs {
             }
 
             public bool DimEquals(IDimension other) => Dimension == other.Dimension;
+
+            public override string ToString() {
+                return Position.ToString() + ": " + Value.ToString();
+            }
         }
     }
 }

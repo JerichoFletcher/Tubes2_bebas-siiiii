@@ -10,7 +10,7 @@ namespace BebasFirstLib.Algorithms {
         /// <summary>
         /// Melakukan pencarian dengan algoritma tertentu.
         /// </summary>
-        /// /// <param name="successPred">Kondisi yang harus dipenuhi oleh goal.</param>
+        /// <param name="successPred">Kondisi yang harus dipenuhi oleh goal.</param>
         /// <returns>Objek hasil pencarian.</returns>
         TReturn Search(Predicate<TPred> successPred);
     }

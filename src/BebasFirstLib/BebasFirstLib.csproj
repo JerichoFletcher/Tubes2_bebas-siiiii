@@ -42,8 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithms\Impl\IMazeTreasureAlgorithm.cs" />
     <Compile Include="Algorithms\Impl\MazeTreasureBFS.cs" />
     <Compile Include="Algorithms\Impl\MazeTreasureDFS.cs" />
+    <Compile Include="Algorithms\Impl\MazeTreasureTraversal.cs" />
     <Compile Include="Algorithms\ISearchAlgorithm.cs" />
     <Compile Include="IO\IPersistent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

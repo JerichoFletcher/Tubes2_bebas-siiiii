@@ -1,4 +1,5 @@
 ﻿using BebasFirstLib.Structs.Traits;
+using System.Text;
 
 namespace BebasFirstLib.Structs {
     /// <summary>
@@ -47,6 +48,17 @@ namespace BebasFirstLib.Structs {
 
         public override int GetHashCode() {
             return elements.GetHashCode();
+        }
+
+        public override string ToString() {
+            StringBuilder str = new StringBuilder();
+            str.Append("(");
+            for(int i = 0; i < elements.Length; i++) {
+                str.Append(elements[i].ToString());
+                if(i < elements.Length - 1) str.Append(", ");
+            }
+            str.Append(")");
+            return str.ToString();
         }
     }
 }
