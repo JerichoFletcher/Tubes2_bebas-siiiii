@@ -8,13 +8,13 @@ namespace BebasFirstLib.IO {
         /// <summary>
         /// Membaca data dari file dan membentuk objek ini.
         /// </summary>
-        /// <param name="fs"><see cref="FileStream"/> berisi data yang akan dibaca.</param>
-        void Read(FileStream fs);
+        /// <param name="fs"><see cref="StreamReader"/> berisi data yang akan dibaca.</param>
+        void Read(StreamReader fs);
 
         /// <summary>
         /// Menulis data objek ini ke dalam file.
         /// </summary>
-        /// <param name="fs"><see cref="FileStream"/> dari file yang akan ditulis.</param>
-        void Write(FileStream fs);
+        /// <param name="fs"><see cref="StreamWriter"/> dari file yang akan ditulis.</param>
+        void Write(StreamWriter fs);
     }
 }

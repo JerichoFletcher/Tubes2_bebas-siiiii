@@ -1,4 +1,5 @@
 ﻿using BebasFirstLib.Structs.Traits;
+using BebasFirstLib.IO;
 using System;
 
 namespace BebasFirstLib.Structs {
@@ -8,11 +9,16 @@ namespace BebasFirstLib.Structs {
     /// <typeparam name="T">Tipe data dari nilai setiap sel dalam peta.</typeparam>
     public class Map<T> : IGridMap<int, Map<T>.MapTile> {
         /// <summary>Buffer internal berisi semua sel pada peta.</summary>
-        private MapTile[] _buffer;
+        protected MapTile[] _buffer;
 
-        public int Dimension { get; private set; }
-        public IVector<int> Size { get; private set; }
+        public int Dimension { get; protected set; }
+        public IVector<int> Size { get; protected set; }
         
+        /// <summary>
+        /// Membentuk sebuah objek <see cref="Map{T}"/> berukuran <paramref name="size"/>.
+        /// </summary>
+        /// <param name="size">Ukuran dari peta.</param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
         public Map(IVector<int> size) {
             int dimension = size.Dimension;
             if(dimension <= 0) throw new ArgumentOutOfRangeException();
@@ -20,10 +26,7 @@ namespace BebasFirstLib.Structs {
             Dimension = dimension;
             Size = size;
 
-            int bufferLength = 1;
-            for(int i = 0; i < dimension; i++)
-                bufferLength *= size[i];
-            _buffer = new MapTile[bufferLength];
+            _buffer = new MapTile[BufferLength];
         }
 
         public MapTile this[IVector<int> position] {
@@ -65,6 +68,15 @@ namespace BebasFirstLib.Structs {
             }
 
             return index;
+        }
+
+        protected int BufferLength {
+            get {
+                int bufferLength = 1;
+                for(int i = 0; i < Dimension; i++)
+                    bufferLength *= Size[i];
+                return bufferLength;
+            }
         }
 
         /// <summary>
