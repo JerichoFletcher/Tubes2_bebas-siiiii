@@ -6,7 +6,9 @@ namespace BebasFirstLib.Structs {
     /// </summary>
     /// <typeparam name="TAxis">Tipe data yang merepresentasikan setiap sumbu dimensi pada grid peta.</typeparam>
     /// <typeparam name="TElement">Tipe data dari elemen dalam peta.</typeparam>
-    public interface IGridMap<TAxis, TElement> : IGrid<TAxis> where TAxis : IComparable {
+    public interface IGridMap<TAxis, TElement> : IGrid<TAxis>
+        where TAxis : IComparable
+        where TElement : IPosition<TAxis> {
         /// <summary>
         /// Mengakses elemen pada posisi yang diberikan.
         /// </summary>
