@@ -1,5 +1,6 @@
 ﻿using System;
 using BebasFirstLib.Structs;
+using BebasFirstTerminal.Algorithms;
 
 namespace BebasFirstTerminal {
     internal class Program {
@@ -23,8 +24,24 @@ namespace BebasFirstTerminal {
 
             PrintRecurseTree(tree1);
             Console.WriteLine();
-            Console.ReadLine();
             // Lakukan test pencarian di sini, output ke terminal
+            var search = new TreeFind<int>(tree1);
+            Console.Write("Cari nilai: ");
+            string inp = Console.ReadLine();
+            if(int.TryParse(inp, out int toSearch)) {
+                Console.WriteLine($"Hasil pencarian tree dengan INFO = {toSearch}:");
+                try {
+                    var found = search.Search(i => i == toSearch);
+                    PrintRecurseTree(found);
+                } catch(TreeFind<int>.NotFoundException) {
+                    Console.WriteLine("Tidak ditemukan!");
+                }
+            } else {
+                Console.WriteLine("Tidak valid!");
+            }
+
+            // PAUSE
+            Console.ReadLine();
         }
     }
 }

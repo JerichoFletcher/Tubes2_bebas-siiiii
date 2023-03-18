@@ -5,7 +5,7 @@ namespace BebasFirstLib.Structs {
     /// Struktur data vektor yang terdiri dari sejumlah komponen bertipe <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">Tipe data dari komponen vektor.</typeparam>
-    public struct Vector<T> : IVector<T> {
+    public class Vector<T> : IVector<T> {
         /// <summary>Larik komponen-komponen vektor.</summary>
         T[] elements;
 
@@ -43,6 +43,10 @@ namespace BebasFirstLib.Structs {
                 return true;
             }
             return false;
+        }
+
+        public override int GetHashCode() {
+            return elements.GetHashCode();
         }
     }
 }

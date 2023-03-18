@@ -29,7 +29,7 @@ namespace BebasFirstLib.Structs {
             _buffer = new MapTile[BufferLength];
         }
 
-        public MapTile this[IVector<int> position] {
+        public virtual MapTile this[IVector<int> position] {
             get {
                 if(!IsInBounds(position)) throw new IndexOutOfRangeException();
                 return _buffer[VecToIndex(position)];
