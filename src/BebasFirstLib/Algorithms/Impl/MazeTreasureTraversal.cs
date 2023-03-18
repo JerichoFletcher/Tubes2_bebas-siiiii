@@ -66,6 +66,10 @@ namespace BebasFirstLib.Algorithms.Impl {
                             yield return i;
                         }
                     }
+
+                    if(path == null) {
+                        yield break;
+                    }
                 }
 
                 if(path?.Length > 0) {
