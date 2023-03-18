@@ -1,12 +1,39 @@
 ﻿using System;
+using System.Data;
 using System.IO;
 using BebasFirstLib.Algorithms.Impl;
 using BebasFirstLib.Structs;
 using BebasFirstLib.Structs.Impl;
-using BebasFirstTerminal.Algorithms;
 
 namespace BebasFirstTerminal {
     internal class Program {
+        static void PrintMap(MazeTreasureMap map) {
+            for(int i = 0; i < map.Size[0]; i++) {
+                for(int j = 0; j < map.Size[1]; j++) {
+                    var pos = new Vector<int>(2);
+                    pos[0] = i; pos[1] = j;
+
+                    var t = map[pos];
+                    switch(t.Value) {
+                        case MazeTreasureMap.MazeTileType.Walkable:
+                            Console.Write(' ');
+                            break;
+                        case MazeTreasureMap.MazeTileType.Obstacle:
+                            Console.Write('X');
+                            break;
+                        case MazeTreasureMap.MazeTileType.Treasure:
+                            Console.Write('T');
+                            break;
+                        case MazeTreasureMap.MazeTileType.KrustyKrabs:
+                            Console.Write('K');
+                            break;
+                    }
+                    Console.Write(' ');
+                }
+                Console.WriteLine();
+            }
+        }
+
         static void Main(string[] args) {
             if(args.Length != 1) {
                 Console.WriteLine("Tidak ada path yang diberikan!");
@@ -25,23 +52,25 @@ namespace BebasFirstTerminal {
                 var map = new MazeTreasureMap(defsize);
                 map.Read(stream);
 
-                for(int i = 0; i < map.Size[0]; i++) {
-                    for(int j = 0; j < map.Size[1]; j++) {
-                        var pos = new Vector<int>(2);
-                        pos[0] = i; pos[1] = j;
-                        Console.Write(map[pos].ToString());
-                        if(j < map.Size[1] - 1) Console.Write(" ");
-                    }
-                    Console.WriteLine();
-                }
+                PrintMap(map);
 
                 var bfs = new MazeTreasureBFS(map);
                 var dfs = new MazeTreasureDFS(map);
-                var trv = new MazeTreasureTraversal<MazeTreasureBFS>(bfs, true);
+                var trv = new MazeTreasureTraversal<MazeTreasureDFS>(dfs, true);
 
-                var treepath = trv.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure);
-                foreach(var t in treepath) {
-                    Console.WriteLine(t.Value.ToString());
+                int d = 1;
+                Tree<MazeTreasureMap.MapTile>[] treepath = null;
+                foreach(var i in trv.Search(_ => true)) {
+                    if(i.Found) treepath = i.Value;
+                    Console.WriteLine($"[{d++}] Visited {i.Visited}, found: {i.Found}");
+                }
+
+                if(treepath != null) {
+                    foreach(var t in treepath) {
+                        Console.WriteLine(t.Value);
+                    }
+                } else {
+                    Console.WriteLine("Tidak ditemukan:(");
                 }
                 
             } catch(FileNotFoundException e) {

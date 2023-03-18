@@ -2,6 +2,7 @@
 using BebasFirstLib.Structs.Impl;
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Schema;
 
 namespace BebasFirstLib.Algorithms.Impl {
@@ -15,6 +16,7 @@ namespace BebasFirstLib.Algorithms.Impl {
         public bool ReturnToStart { get; private set; }
 
         private HashSet<MazeTreasureMap.MapTile> treasureTiles;
+        private bool finished;
 
         public MazeTreasureTraversal(T algorithm, bool returnToStart = false) {
             Algorithm = algorithm;
@@ -26,9 +28,10 @@ namespace BebasFirstLib.Algorithms.Impl {
             treasureTiles = new HashSet<MazeTreasureMap.MapTile>();
             foreach(var pos in Maze.Treasures)
                 treasureTiles.Add(Maze[pos]);
+            finished = false;
         }
 
-        public Tree<MazeTreasureMap.MapTile>[] Search(Predicate<MazeTreasureMap.MapTile> successPred) {
+        public IEnumerable<MazeTreasureSearchStep> Search(Predicate<MazeTreasureMap.MapTile> successPred) {
             var finalPath = new List<Tree<MazeTreasureMap.MapTile>>();
             var ignore = new List<MazeTreasureMap.MapTile>();
             foreach(var i in Ignore) ignore.Add(i);
@@ -37,7 +40,16 @@ namespace BebasFirstLib.Algorithms.Impl {
             while(TreasureCount > 0) {
                 Algorithm.Start = currentStart;
                 Algorithm.Ignore = ignore;
-                var path = Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure && treasureTiles.Contains(tile));
+                Tree<MazeTreasureMap.MapTile>[] path = null;
+
+                foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure && treasureTiles.Contains(tile))) {
+                    path = i.Value;
+                    if(!i.Found) {
+                        var ret = i;
+                        ret.Found = false;
+                        yield return i;
+                    }
+                }
 
                 if(path == null) {
                     var oldIgnore = ignore[0];
@@ -45,7 +57,15 @@ namespace BebasFirstLib.Algorithms.Impl {
                     foreach(var t in Algorithm.Maze.NeighborsOf(currentStart))
                         if(MazeTreasureMap.Walkable(t) && t != oldIgnore) ignore.Add(t);
                     Algorithm.Ignore = ignore;
-                    path = Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure && treasureTiles.Contains(tile));
+
+                    foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure && treasureTiles.Contains(tile))) {
+                        path = i.Value;
+                        if(!i.Found) {
+                            var ret = i;
+                            ret.Found = false;
+                            yield return i;
+                        }
+                    }
                 }
 
                 if(path?.Length > 0) {
@@ -58,22 +78,31 @@ namespace BebasFirstLib.Algorithms.Impl {
                     currentStart = reached.Value;
                     ignore.Clear();
                     if(!reached.IsRoot()) ignore.Add(reached.Parent.Value);
+
+                    finished = !ReturnToStart && TreasureCount == 0;
+                    yield return new MazeTreasureSearchStep(finished ? finalPath.ToArray() : null, finished, reached.Value, null);
                 }
             }
 
             if(ReturnToStart) {
                 Algorithm.Start = currentStart;
-                var path = Algorithm.Search(tile => tile == Start);
+                Tree<MazeTreasureMap.MapTile>[] path = null;
+                foreach(var i in Algorithm.Search(tile => tile == Start)) {
+                    path = i.Value;
+                    if(!i.Found) {
+                        yield return i;
+                    }
+                }
 
                 if(path?.Length > 0) {
                     var reached = path[path.Length - 1];
 
                     if(finalPath.Count > 0) finalPath.RemoveAt(finalPath.Count - 1);
                     finalPath.AddRange(path);
+
+                    yield return new MazeTreasureSearchStep(finalPath.ToArray(), true, reached.Value, null);
                 }
             }
-
-            return finalPath.ToArray();
         }
     }
 }
