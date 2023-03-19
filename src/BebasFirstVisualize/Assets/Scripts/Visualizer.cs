@@ -46,7 +46,7 @@ namespace BebasFirstVisualize {
 
             Vector2Int mazeSize = new Vector2Int(maze.Size[0], maze.Size[1]);
             
-            float ratio = (float)mazeSize.y / mazeSize.x;
+            float ratio = (float)mazeSize.x / mazeSize.y;
             float width = maxBounds.size.x, height = ratio * width;
             if(height > maxBounds.size.y) {
                 height = maxBounds.size.y;
@@ -54,7 +54,7 @@ namespace BebasFirstVisualize {
             }
 
             mapBounds = new Rect(maxBounds.center.x - width / 2f, maxBounds.center.y - height / 2f, width, height);
-            float tileSize = mapBounds.width / mazeSize.x;
+            float tileSize = mapBounds.height / mazeSize.x;
 
             for(int i = 0; i < mazeSize.x; i++) {
                 for(int j = 0; j < mazeSize.y; j++) {

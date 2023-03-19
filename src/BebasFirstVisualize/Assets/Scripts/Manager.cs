@@ -8,6 +8,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEditor;
 
 namespace BebasFirstVisualize {
     [RequireComponent(typeof(Visualizer))]
@@ -15,11 +16,15 @@ namespace BebasFirstVisualize {
         public static Manager Instance { get; private set; }
 
         [SerializeField]
-        Button buttonStartSearch;
+        Button buttonStartSearch, buttonLoadFile;
         [SerializeField]
         TMP_InputField inputFilepath;
         [SerializeField]
         TMP_Text textResult;
+        [SerializeField]
+        TMP_Dropdown dropdownAlgo;
+        [SerializeField]
+        Toggle toggleTSP;
         [SerializeField, Range(0f, 10f)]
         float delay;
         [SerializeField, Range(1, 50)]
@@ -27,60 +32,92 @@ namespace BebasFirstVisualize {
 
         Visualizer vis;
 
-        bool processing;
         MazeTreasureMap maze;
         Stopwatch sw;
 
         public int Mode { get; set; }
         public bool ReturnToStart { get; set; }
 
+        bool Processing {
+            get {
+                return _processing;
+            }
+            set {
+                _processing = value;
+                buttonStartSearch.interactable
+                    = inputFilepath.interactable
+                    = buttonLoadFile.interactable
+                    = dropdownAlgo.interactable
+                    = toggleTSP.interactable
+                    = !value;
+            }
+        }
+        bool _processing;
+
         private void Start() {
             if(Instance != null) Destroy(this);
             Instance = this;
 
-            processing = false;
+            Processing = false;
             vis = GetComponent<Visualizer>();
         }
 
-        private void Update() {
-            buttonStartSearch.interactable = !processing;
-        }
-
         public void OnStartSearch() {
-            if(processing) return;
+            if(Processing) return;
             if(maze == null) {
                 UnityEngine.Debug.LogError(textResult.text);
                 return;
             }
+            StopCoroutines();
             StartCoroutine(Search());
         }
 
         public void OnLoadFile() {
             string path = inputFilepath.text;
-            if(string.IsNullOrEmpty(path)) {
-                processing = false;
+            if(string.IsNullOrEmpty(path))
                 return;
-            }
 
             FileStream f = null;
+            StreamReader stream = null;
             try {
                 f = File.OpenRead(path);
-                var stream = new StreamReader(f);
+                stream = new StreamReader(f);
 
                 var size = Helper.VectorFrom(1, 1);
                 maze = new MazeTreasureMap(size);
                 maze.Read(stream);
 
+                StopCoroutines();
                 vis.Visualize(maze);
+                
+                textResult.text = "";
+                UnityEngine.Debug.Log($"Successfully read from file {path}");
             } catch(FileNotFoundException) {
-                UnityEngine.Debug.LogError(textResult.text);
+                textResult.text = "File not found!";
+                UnityEngine.Debug.LogError($"Not found: {path}");
+            } catch(InvalidDataException) {
+                textResult.text = "File is invalid!";
+                UnityEngine.Debug.LogError($"Invalid: {path}");
+            } catch(Exception e) {
+                textResult.text = "Failed to open!";
+                UnityEngine.Debug.LogError($"Caught {e.GetType().Name}: {path}\n{e}");
             } finally {
+                stream?.Close();
                 f?.Close();
             }
         }
 
+        public void OnExit() {
+            StopCoroutines();
+#if UNITY_EDITOR
+            EditorApplication.ExitPlaymode();
+#else
+            Application.Quit();
+#endif
+        }
+
         IEnumerator Search() {
-            processing = true;
+            Processing = true;
             textResult.text = string.Empty;
 
             sw = Stopwatch.StartNew();
@@ -140,14 +177,21 @@ namespace BebasFirstVisualize {
                 yield return new WaitForSeconds(delay);
             }
 
-            processing = false;
+            Processing = false;
 
             double t = (double)elapsed * Stopwatch.Frequency / (1000L * 1000L * 1000L);
             textResult.text = $"Time elapsed: {t}ms Visited nodes: {steps.Count}";
-            if(steps.Count > 0 && steps[steps.Count - 1].Found) {
-                textResult.text += $" Path length: {steps[steps.Count - 1].Value.Length}";
+            if(steps.Count > 0 && steps[^1].Found) {
+                textResult.text += $" Path length: {steps[^1].Value.Length}";
+            } else {
+                textResult.text += " No path found";
             }
             UnityEngine.Debug.Log(textResult.text);
+        }
+
+        void StopCoroutines() {
+            StopAllCoroutines();
+            vis.StopAllCoroutines();
         }
     }
 }

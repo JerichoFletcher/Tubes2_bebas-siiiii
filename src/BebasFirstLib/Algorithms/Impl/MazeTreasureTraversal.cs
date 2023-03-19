@@ -90,11 +90,36 @@ namespace BebasFirstLib.Algorithms.Impl {
 
             if(ReturnToStart) {
                 Algorithm.Start = currentStart;
+                Algorithm.Ignore = ignore;
                 Tree<MazeTreasureMap.MapTile>[] path = null;
-                foreach(var i in Algorithm.Search(tile => tile == Start)) {
+
+                foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.KrustyKrabs)) {
                     path = i.Value;
                     if(!i.Found) {
+                        var ret = i;
+                        ret.Found = false;
                         yield return i;
+                    }
+                }
+
+                if(path == null) {
+                    var oldIgnore = ignore[0];
+                    ignore.Clear();
+                    foreach(var t in Algorithm.Maze.NeighborsOf(currentStart))
+                        if(MazeTreasureMap.Walkable(t) && t != oldIgnore) ignore.Add(t);
+                    Algorithm.Ignore = ignore;
+
+                    foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.KrustyKrabs)) {
+                        path = i.Value;
+                        if(!i.Found) {
+                            var ret = i;
+                            ret.Found = false;
+                            yield return i;
+                        }
+                    }
+
+                    if(path == null) {
+                        yield break;
                     }
                 }
 
