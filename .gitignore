@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Generated debug information
+bin/GUIApp/*_DoNotShip/*
+
 # User-specific files
 *.rsuser
 *.suo
