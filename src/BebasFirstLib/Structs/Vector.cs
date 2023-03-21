@@ -28,6 +28,19 @@ namespace BebasFirstLib.Structs {
         }
 
         /// <summary>
+        /// Membuat sebuah vektor dengan komponen-komponen yang diberikan.
+        /// </summary>
+        /// <param name="comps">Komponen-komponen dari vektor.</param>
+        /// <returns>Vektor dengan komponen-komponen yang diberikan.</returns>
+        public static Vector<T> From(params T[] comps) {
+            Vector<T> vec = new Vector<T>(comps.Length);
+            for(int i = 0; i < comps.Length; i++) {
+                vec[i] = comps[i];
+            }
+            return vec;
+        }
+
+        /// <summary>
         /// Memeriksa apakah vektor ini sama dengan <paramref name="other"/>.
         /// </summary>
         /// <param name="other">Objek lain yang diperiksa</param>

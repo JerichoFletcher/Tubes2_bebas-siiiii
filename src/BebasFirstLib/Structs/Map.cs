@@ -12,10 +12,34 @@ namespace BebasFirstLib.Structs {
     public class Map<T> : IGridMap<int, Map<T>.MapTile> {
         /// <summary>Buffer internal berisi semua sel pada peta.</summary>
         protected MapTile[] _buffer;
+        /// <summary>Banyak elemen dalam buffer.</summary>
+        protected int _bufferLength = -1;
+        /// <summary>Ukuran dari grid.</summary>
+        protected IVector<int> _size;
 
         public int Dimension { get; protected set; }
-        public IVector<int> Size { get; protected set; }
-        
+        public IVector<int> Size {
+            get {
+                return _size;
+            }
+            set {
+                _size = value;
+                _bufferLength = -1;
+            }
+        }
+        /// <summary>
+        /// Banyak elemen dalam buffer.
+        /// </summary>
+        protected int BufferLength {
+            get {
+                if(_bufferLength >= 0) return _bufferLength;
+                _bufferLength = 1;
+                for(int i = 0; i < Dimension; i++)
+                    _bufferLength *= Size[i];
+                return _bufferLength;
+            }
+        }
+
         /// <summary>
         /// Membentuk sebuah objek <see cref="Map{T}"/> berukuran <paramref name="size"/>.
         /// </summary>
@@ -74,6 +98,12 @@ namespace BebasFirstLib.Structs {
             return temp;
         }
 
+        /// <summary>
+        /// Mengubah sebuah vektor koordinat elemen menjadi indeks elemen tersebut dalam buffer.
+        /// </summary>
+        /// <param name="vec">Vektor koordinat elemen yang dituju.</param>
+        /// <returns>Indeks elemen yang dituju dalam buffer.</returns>
+        /// <exception cref="ArgumentException"/>
         protected int VecToIndex(IVector<int> vec) {
             if(!DimEquals(vec)) throw new ArgumentException();
 
@@ -85,15 +115,6 @@ namespace BebasFirstLib.Structs {
             }
 
             return index;
-        }
-
-        protected int BufferLength {
-            get {
-                int bufferLength = 1;
-                for(int i = 0; i < Dimension; i++)
-                    bufferLength *= Size[i];
-                return bufferLength;
-            }
         }
 
         /// <summary>

@@ -10,25 +10,11 @@ namespace BebasFirstTerminal {
         static void PrintMap(MazeTreasureMap map) {
             for(int i = 0; i < map.Size[0]; i++) {
                 for(int j = 0; j < map.Size[1]; j++) {
-                    var pos = new Vector<int>(2);
-                    pos[0] = i; pos[1] = j;
+                    var pos = Vector<int>.From(i, j);
 
                     var t = map[pos];
-                    switch(t.Value) {
-                        case MazeTreasureMap.MazeTileType.Walkable:
-                            Console.Write(' ');
-                            break;
-                        case MazeTreasureMap.MazeTileType.Obstacle:
-                            Console.Write('X');
-                            break;
-                        case MazeTreasureMap.MazeTileType.Treasure:
-                            Console.Write('T');
-                            break;
-                        case MazeTreasureMap.MazeTileType.KrustyKrabs:
-                            Console.Write('K');
-                            break;
-                    }
-                    Console.Write(' ');
+                    char c = t.Value == MazeTreasureMap.MazeTileType.Walkable ? ' ' : t.Value.Char;
+                    Console.Write(c + " ");
                 }
                 Console.WriteLine();
             }
@@ -46,10 +32,7 @@ namespace BebasFirstTerminal {
                 fs = File.OpenRead(path);
                 var stream = new StreamReader(fs);
 
-                var defsize = new Vector<int>(2);
-                defsize[0] = 1; defsize[1] = 1;
-
-                var map = new MazeTreasureMap(defsize);
+                var map = new MazeTreasureMap();
                 map.Read(stream);
 
                 PrintMap(map);

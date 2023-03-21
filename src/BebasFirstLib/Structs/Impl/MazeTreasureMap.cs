@@ -2,22 +2,24 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.CodeDom;
 
 namespace BebasFirstLib.Structs.Impl {
     /// <summary>
     /// Merepresentasikan sebuah peta terbatas dari persoalan Maze Treasure Hunt.
     /// </summary>
     public class MazeTreasureMap : Map<MazeTreasureMap.MazeTileType>, IPersistent {
+        /// <summary>Dimensi dari peta.</summary>
         private const int MAZE_DIMENSION = 2;
-        private const char
-            CHAR_KRUSTY_KRAB = 'K',
-            CHAR_TREASURE = 'T',
-            CHAR_TRAVERSABLE = 'R',
-            CHAR_OBSTACLE = 'X';
-        private static char[] VALID_CHARS = { CHAR_TRAVERSABLE, CHAR_OBSTACLE, CHAR_TREASURE, CHAR_KRUSTY_KRAB };
 
         /// <summary>
-        /// Membentuk sebuah objek <see cref="MazeTreasureMap{T}"/> berukuran <paramref name="size"/>.
+        /// Membentuk sebuah objek <see cref="MazeTreasureMap"> kosong.
+        /// </summary>
+        /// <inheritdoc cref="Map{T}.Map(IVector{int})"/>
+        public MazeTreasureMap() : this(Vector<int>.From(0, 0)) { }
+
+        /// <summary>
+        /// Membentuk sebuah objek <see cref="MazeTreasureMap"/> berukuran <paramref name="size"/>.
         /// </summary>
         /// <inheritdoc cref="Map{T}.Map(IVector{int})"/>
         public MazeTreasureMap(IVector<int> size) : base(size) {
@@ -31,16 +33,6 @@ namespace BebasFirstLib.Structs.Impl {
 
         public static bool Walkable(MapTile tile) {
             return tile.Value != MazeTileType.Obstacle;
-        }
-
-        public static MazeTileType TypeOf(char c) {
-            switch(c) {
-                case CHAR_TRAVERSABLE: return MazeTileType.Walkable;
-                case CHAR_OBSTACLE: return MazeTileType.Obstacle;
-                case CHAR_TREASURE: return MazeTileType.Treasure;
-                case CHAR_KRUSTY_KRAB: return MazeTileType.KrustyKrabs;
-                default: throw new ArgumentException();
-            }
         }
 
         /// <summary>
@@ -62,17 +54,12 @@ namespace BebasFirstLib.Structs.Impl {
             }
         }
 
-        private bool IsValidChar(char c) {
-            foreach(char v in VALID_CHARS)
-                if(v == c) return true;
-            return false;
-        }
-
         /// <exception cref="InvalidDataException"/>
         /// <inheritdoc cref="IPersistent.Read(FileStream)"/>
         public void Read(StreamReader fs) {
+            StartPos = null;
+            Treasures.Clear();
             List<MapTile> temp = new List<MapTile>();
-            Vector<int> size = new Vector<int>(MAZE_DIMENSION);
 
             int x = 0, y = 0;
             while(!fs.EndOfStream) {
@@ -82,28 +69,31 @@ namespace BebasFirstLib.Structs.Impl {
                 y = 0;
                 string[] split = line.Split(' ');
                 foreach(string s in split) {
-                    if(s.Length != 1 || !IsValidChar(s[0])) throw new InvalidDataException();
-                    Vector<int> pos = new Vector<int>(MAZE_DIMENSION);
-                    pos[0] = x; pos[1] = y;
-                    temp.Add(new MapTile(TypeOf(s[0]), pos));
+                    if(s.Length != 1) throw new InvalidDataException();
+                    Vector<int> pos = Vector<int>.From(x, y);
+                    temp.Add(new MapTile(MazeTileType.From(s[0]) ?? throw new InvalidDataException(), pos));
                     y++;
                 }
                 x++;
             }
 
-            size[0] = x; size[1] = y;
-            Size = size;
+            Size = Vector<int>.From(x, y);
 
-            Array.Resize(ref _buffer, BufferLength);
-            foreach(MapTile tile in temp)
-                this[tile.Position] = tile;
+            try {
+                Array.Resize(ref _buffer, BufferLength);
+                foreach(MapTile tile in temp)
+                    this[tile.Position] = tile;
+            } catch(IndexOutOfRangeException) {
+                throw new InvalidDataException();
+            }
+
+            if(StartPos == null) throw new InvalidCastException();
         }
 
         public void Write(StreamWriter fs) {
             for(int i = 0; i < Size[0]; i++) {
                 for(int j = 0; j < Size[1]; j++) {
-                    Vector<int> pos = new Vector<int>(MAZE_DIMENSION);
-                    pos[0] = i; pos[1] = j;
+                    Vector<int> pos = Vector<int>.From(i, j);
                     fs.Write(this[pos]);
                     if(j < Size[1] - 1) fs.Write(' ');
                 }
@@ -111,11 +101,66 @@ namespace BebasFirstLib.Structs.Impl {
             }
         }
 
-        public enum MazeTileType {
-            Walkable = 0,
-            Obstacle = 1,
-            Treasure = 2,
-            KrustyKrabs = 3
+        /// <summary>
+        /// Merepresentasikan tipe sel dalam peta.
+        /// </summary>
+        public struct MazeTileType {
+            public static readonly MazeTileType
+                Walkable = new MazeTileType('R'),
+                Obstacle = new MazeTileType('X'),
+                Treasure = new MazeTileType('T'),
+                KrustyKrabs = new MazeTileType('K');
+            public static readonly MazeTileType[] Values = new MazeTileType[] { Walkable, Obstacle, Treasure, KrustyKrabs };
+
+            /// <summary>Nilai karakter dari tipe sel ini.</summary>
+            public char Char { get; private set; }
+
+            private MazeTileType(char ch) {
+                Char = ch;
+            }
+
+            /// <summary>
+            /// Memetakan sebuah karakter ke <see cref="MazeTileType"/> yang bersesuaian.
+            /// </summary>
+            /// <param name="ch">Karakter yang dipetakan.</param>
+            /// <returns>
+            ///     Objek <see cref="MazeTileType"/> yang bernilai <paramref name="ch"/>;
+            ///     <see langword="null"/> jika tidak ada.
+            /// </returns>
+            public static MazeTileType? From(char ch) {
+                switch(ch) {
+                    case 'R': return Walkable;
+                    case 'X': return Obstacle;
+                    case 'T': return Treasure;
+                    case 'K': return KrustyKrabs;
+                    default: return null;
+                }
+            }
+
+            public override bool Equals(object obj) {
+                return obj is MazeTileType type && Char.Equals(type.Char);
+            }
+
+            public override int GetHashCode() {
+                return Char.GetHashCode();
+            }
+
+            public override string ToString() {
+                switch(Char) {
+                    case 'R': return "Walkable";
+                    case 'X': return "Obstacle";
+                    case 'T': return "Treasure";
+                    default: return "KrustyKrabs"; // Char == 'K'
+                }
+            }
+
+            public static bool operator ==(MazeTileType t1, MazeTileType t2) {
+                return t1.Char == t2.Char;
+            }
+
+            public static bool operator !=(MazeTileType t1, MazeTileType t2) {
+                return t1.Char != t2.Char;
+            }
         }
     }
 }

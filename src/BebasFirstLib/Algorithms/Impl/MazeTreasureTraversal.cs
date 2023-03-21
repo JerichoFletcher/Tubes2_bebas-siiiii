@@ -42,7 +42,7 @@ namespace BebasFirstLib.Algorithms.Impl {
                 Algorithm.Ignore = ignore;
                 Tree<MazeTreasureMap.MapTile>[] path = null;
 
-                foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure && treasureTiles.Contains(tile))) {
+                foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure && treasureTiles.Contains(tile) && successPred(tile))) {
                     path = i.Value;
                     if(!i.Found) {
                         var ret = i;
@@ -58,7 +58,7 @@ namespace BebasFirstLib.Algorithms.Impl {
                         if(MazeTreasureMap.Walkable(t) && t != oldIgnore) ignore.Add(t);
                     Algorithm.Ignore = ignore;
 
-                    foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure && treasureTiles.Contains(tile))) {
+                    foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.Treasure && treasureTiles.Contains(tile) && successPred(tile))) {
                         path = i.Value;
                         if(!i.Found) {
                             var ret = i;
@@ -93,7 +93,7 @@ namespace BebasFirstLib.Algorithms.Impl {
                 Algorithm.Ignore = ignore;
                 Tree<MazeTreasureMap.MapTile>[] path = null;
 
-                foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.KrustyKrabs)) {
+                foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.KrustyKrabs && successPred(tile))) {
                     path = i.Value;
                     if(!i.Found) {
                         var ret = i;
@@ -109,7 +109,7 @@ namespace BebasFirstLib.Algorithms.Impl {
                         if(MazeTreasureMap.Walkable(t) && t != oldIgnore) ignore.Add(t);
                     Algorithm.Ignore = ignore;
 
-                    foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.KrustyKrabs)) {
+                    foreach(var i in Algorithm.Search(tile => tile.Value == MazeTreasureMap.MazeTileType.KrustyKrabs && successPred(tile))) {
                         path = i.Value;
                         if(!i.Found) {
                             var ret = i;

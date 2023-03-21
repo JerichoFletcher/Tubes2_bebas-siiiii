@@ -62,14 +62,14 @@ namespace BebasFirstVisualize {
                     var tile = Instantiate(tileObj, new Vector3(mapBounds.xMin + (j + .5f) * tileSize, mapBounds.yMax - (i + .5f) * tileSize, 0f), Quaternion.identity);
                     tile.transform.localScale = Vector3.one * tileScale * tileSize;
                     Color col = walkableColor;
-                    switch(maze[pos].Value) {
-                        case MazeTreasureMap.MazeTileType.Obstacle:
+                    switch(maze[pos].Value.Char) {
+                        case 'X':
                             col = obstacleColor;
                             break;
-                        case MazeTreasureMap.MazeTileType.Treasure:
+                        case 'T':
                             col = treasureColor;
                             break;
-                        case MazeTreasureMap.MazeTileType.KrustyKrabs:
+                        case 'K':
                             col = krustyColor;
                             break;
                         default: break;
@@ -100,14 +100,14 @@ namespace BebasFirstVisualize {
             foreach(var t in tiles) {
                 t.Value.TimesVisited = 0;
                 Color col = walkableColor;
-                switch(t.Key.Value) {
-                    case MazeTreasureMap.MazeTileType.Obstacle:
+                switch(t.Key.Value.Char) {
+                    case 'X':
                         col = obstacleColor;
                         break;
-                    case MazeTreasureMap.MazeTileType.Treasure:
+                    case 'T':
                         col = treasureColor;
                         break;
-                    case MazeTreasureMap.MazeTileType.KrustyKrabs:
+                    case 'K':
                         col = krustyColor;
                         break;
                     default: break;
