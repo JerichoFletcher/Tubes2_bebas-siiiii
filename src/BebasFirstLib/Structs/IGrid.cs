@@ -8,7 +8,7 @@ namespace BebasFirstLib.Structs {
     /// <typeparam name="T">Tipe data yang merepresentasikan setiap sumbu dimensi pada grid.</typeparam>
     public interface IGrid<T> : IDimension where T : IComparable {
         /// <summary>Ukuran dari grid.</summary>
-        IVector<int> Size { get; }
+        IVector<T> Size { get; }
 
         /// <summary>
         /// Memeriksa apakah posisi yang diberikan berada di dalam batasan grid.
