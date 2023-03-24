@@ -52,7 +52,7 @@ namespace BebasFirstLib.Algorithms.Impl {
                 }
 
                 if(path == null) {
-                    var oldIgnore = ignore[0];
+                    /*var oldIgnore = ignore[0];
                     ignore.Clear();
                     foreach(var t in Algorithm.Maze.NeighborsOf(currentStart))
                         if(MazeTreasureMap.Walkable(t) && t != oldIgnore) ignore.Add(t);
@@ -69,7 +69,8 @@ namespace BebasFirstLib.Algorithms.Impl {
 
                     if(path == null) {
                         yield break;
-                    }
+                    }*/
+                    yield break;
                 }
 
                 if(path?.Length > 0) {
@@ -80,8 +81,8 @@ namespace BebasFirstLib.Algorithms.Impl {
                     finalPath.AddRange(path);
 
                     currentStart = reached.Value;
-                    ignore.Clear();
-                    if(!reached.IsRoot()) ignore.Add(reached.Parent.Value);
+                    //ignore.Clear();
+                    //if(!reached.IsRoot()) ignore.Add(reached.Parent.Value);
 
                     finished = !ReturnToStart && TreasureCount == 0;
                     yield return new MazeTreasureSearchStep(finished ? finalPath.ToArray() : null, finished, reached.Value, null);
@@ -103,7 +104,7 @@ namespace BebasFirstLib.Algorithms.Impl {
                 }
 
                 if(path == null) {
-                    var oldIgnore = ignore[0];
+                    /*var oldIgnore = ignore[0];
                     ignore.Clear();
                     foreach(var t in Algorithm.Maze.NeighborsOf(currentStart))
                         if(MazeTreasureMap.Walkable(t) && t != oldIgnore) ignore.Add(t);
@@ -120,7 +121,8 @@ namespace BebasFirstLib.Algorithms.Impl {
 
                     if(path == null) {
                         yield break;
-                    }
+                    }*/
+                    yield break;
                 }
 
                 if(path?.Length > 0) {
