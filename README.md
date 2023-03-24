@@ -21,9 +21,9 @@ Dalam menyelesaikan program ini algoritma yang digunakan yaitu BFS dan DFS.
   Algoritma Depth First Search merupakan algoritma traversal yang mencari simpul-simpul pada graf secara mendalam.  Adapun metode DFS secara umum secara rekursif adalah sebagai berikut Kunjungi simpul v, lalu Kunjungi simpul w yang bertetangga dengan simpul v setelah itu, Ulangi DFS mulai dari simpul w.Ketika mencapai simpul u sedemikian sehingga semua simpul yang bertetangga dengannya telah dikunjungi, pencarian dirunut-balik (backtrack) ke simpul terakhir yang dikunjungi sebelumnya dan mempunyai simpul w yang belum dikunjungi.Pencarian berakhir bila tidak ada lagi simpul yang belum dikunjungi yang dapat dicapai dari simpul yang telah dikunjungi.Dalam penyelesaiannya algoritma ini menggunakan struktur data Stack. Adapun penerapannya dalam kasus Maze Treasure Hunt adalah algoritma DFS ini akan mencari satu treasure hunt kemudian akan dipanggil kembali dengan start adalah posisi treasure hunt yang terakhir kali ditemukan. Jika treasure hunt sudah habis atau sudah tidak ada jalan lain program selesai. 
 
 
-## Requirement Program
-* Visual Studio 2022
-* C#.NET framework 4.8.1
+## Requirement Build Library
+* Unity 2022.1.2f1 (or later)
+* C#.NET framework 4.8
 
 
 ## Cara Menjalankan Program
