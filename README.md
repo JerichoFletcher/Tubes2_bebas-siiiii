@@ -1,5 +1,5 @@
 ﻿# Tugas Besar II bebas-siiiii
-Tugas Besar II <br> IF2211 Strategi Algoritma Semester II Tahun 2022/2023 <br>Implementasi BFS dan DFS dalam Maze Trea 
+Tugas Besar II <br> IF2211 Strategi Algoritma Semester II Tahun 2022/2023 <br>Implementasi BFS dan DFS dalam Maze Tree
 
 ## Daftar Isi
 * [Penjelasan Ringkas Program](#penjelasan-ringkas-program)
