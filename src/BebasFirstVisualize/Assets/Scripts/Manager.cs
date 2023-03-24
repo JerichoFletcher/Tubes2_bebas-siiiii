@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using BebasFirstLib.Structs;
 using BebasFirstLib.Structs.Impl;
 using BebasFirstLib.Algorithms.Impl;
 using System;
@@ -9,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEditor;
+using System.Text;
 
 namespace BebasFirstVisualize {
     [RequireComponent(typeof(Visualizer))]
@@ -59,6 +61,8 @@ namespace BebasFirstVisualize {
 
             Processing = false;
             vis = GetComponent<Visualizer>();
+
+            textResult.text = string.Empty;
         }
 
         private void Update() {
@@ -187,11 +191,39 @@ namespace BebasFirstVisualize {
             double t = (double)elapsed * Stopwatch.Frequency / (1000L * 1000L * 1000L);
             textResult.text = $"Time elapsed: {t}ms Visited nodes: {steps.Count}";
             if(steps.Count > 0 && steps[^1].Found) {
-                textResult.text += $" Path length: {steps[^1].Value.Length}";
+                textResult.text += $"\nPath (len: {steps[^1].Value.Length - 1}): {GetSteps(steps[^1].Value)}";
             } else {
                 textResult.text += " No path found";
             }
             UnityEngine.Debug.Log(textResult.text);
+        }
+
+        string GetSteps(Tree<MazeTreasureMap.MapTile>[] nodes) {
+            var str = new StringBuilder();
+            if(nodes?.Length > 1) {
+                for(int i = 0; i < nodes.Length - 1; i++) {
+                    IVector<int>
+                        v1 = nodes[i].Value.Position,
+                        v2 = nodes[i + 1].Value.Position;
+                    Vector2Int
+                        vec1 = new(v1[0], v1[1]),
+                        vec2 = new(v2[0], v2[1]),
+                        d = vec2 - vec1;
+
+                    // Because the map is rotated 90 degrees CW from its abstract interpretation
+                    if(d.Equals(Vector2Int.left))
+                        str.Append('U');
+                    else if(d.Equals(Vector2Int.right))
+                        str.Append('D');
+                    else if(d.Equals(Vector2Int.up))
+                        str.Append('R');
+                    else if(d.Equals(Vector2Int.down))
+                        str.Append('L');
+                    else
+                        str.Append('?');
+                }
+            }
+            return str.ToString();
         }
 
         void StopCoroutines() {
