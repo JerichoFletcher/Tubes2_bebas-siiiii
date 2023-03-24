@@ -16,7 +16,7 @@ namespace BebasFirstVisualize {
         public static Manager Instance { get; private set; }
 
         [SerializeField]
-        Button buttonStartSearch, buttonLoadFile;
+        Button buttonStartSearch, buttonLoadFile, buttonShowPath;
         [SerializeField]
         TMP_InputField inputFilepath;
         [SerializeField]
@@ -44,8 +44,7 @@ namespace BebasFirstVisualize {
             }
             set {
                 _processing = value;
-                buttonStartSearch.interactable
-                    = inputFilepath.interactable
+                inputFilepath.interactable
                     = buttonLoadFile.interactable
                     = dropdownAlgo.interactable
                     = toggleTSP.interactable
@@ -60,6 +59,11 @@ namespace BebasFirstVisualize {
 
             Processing = false;
             vis = GetComponent<Visualizer>();
+        }
+
+        private void Update() {
+            buttonShowPath.interactable = vis.HasPath;
+            buttonStartSearch.interactable = maze != null && !Processing;
         }
 
         public void OnStartSearch() {
@@ -84,8 +88,9 @@ namespace BebasFirstVisualize {
                 stream = new StreamReader(f);
 
                 var size = Helper.VectorFrom(1, 1);
-                maze = new MazeTreasureMap(size);
-                maze.Read(stream);
+                var newMaze = new MazeTreasureMap(size);
+                newMaze.Read(stream);
+                maze = newMaze;
 
                 StopCoroutines();
                 vis.Visualize(maze);
@@ -171,7 +176,7 @@ namespace BebasFirstVisualize {
                     }
             }
 
-            vis.ResetColor();
+            vis.ResetDisplay();
             foreach(var i in steps) {
                 vis.Accept(i);
                 yield return new WaitForSeconds(delay);
